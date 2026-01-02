@@ -10,7 +10,21 @@ const nextConfig: NextConfig = {
   ...(isGithubPages && {
     basePath: `/${repoName}`,
     assetPrefix: `/${repoName}/`,
-  })
+  }),
+  // Image configuration for static export and external images
+  images: {
+    unoptimized: true, // Required for static export
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'www.rstisrael.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

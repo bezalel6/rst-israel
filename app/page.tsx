@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import {
   Zap,
   Ruler,
@@ -17,11 +18,33 @@ import {
   MapPin,
   Mail,
   Printer,
+  LucideIcon,
 } from "lucide-react";
+
+// --- TypeScript Interfaces ---
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  children: React.ReactNode;
+  variant?: "primary" | "secondary" | "outline";
+  className?: string;
+}
+
+interface SectionHeadingProps {
+  title: string;
+  subtitle?: string;
+  centered?: boolean;
+}
+
+interface CardProps {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  features?: string[];
+}
 
 // --- Components ---
 
-const Button = ({
+const Button: React.FC<ButtonProps> = ({
   children,
   variant = "primary",
   className = "",
@@ -29,7 +52,7 @@ const Button = ({
 }) => {
   const baseStyle =
     "px-6 py-3 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 transform active:scale-95";
-  const variants = {
+  const variants: Record<"primary" | "secondary" | "outline", string> = {
     primary:
       "bg-cyan-600 text-white hover:bg-cyan-700 shadow-lg hover:shadow-cyan-500/30",
     secondary:
@@ -48,7 +71,11 @@ const Button = ({
   );
 };
 
-const SectionHeading = ({ title, subtitle, centered = true }) => (
+const SectionHeading: React.FC<SectionHeadingProps> = ({
+  title,
+  subtitle,
+  centered = true
+}) => (
   <div className={`mb-12 ${centered ? "text-center" : "text-right"}`}>
     <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
       {title}
@@ -66,7 +93,12 @@ const SectionHeading = ({ title, subtitle, centered = true }) => (
   </div>
 );
 
-const Card = ({ icon: Icon, title, description, features = [] }) => (
+const Card: React.FC<CardProps> = ({
+  icon: Icon,
+  title,
+  description,
+  features = []
+}) => (
   <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group h-full flex flex-col">
     <div className="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-cyan-600 transition-colors duration-300">
       <Icon className="w-6 h-6 text-cyan-600 group-hover:text-white transition-colors duration-300" />
@@ -106,7 +138,7 @@ export default function App() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToSection = (id) => {
+  const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth" });
@@ -133,12 +165,14 @@ export default function App() {
             className="flex items-center gap-3 cursor-pointer"
             onClick={() => window.scrollTo(0, 0)}
           >
-            {/* Trying to load logo from the Theme path provided. 
+            {/* Trying to load logo from the Theme path provided.
                 Fallback to local/uploaded logo if not found.
              */}
-            <img
+            <Image
               src="https://www.rstisrael.com/wp-content/themes/Netbuy/images/logo.png"
               alt="RST Israel Logo"
+              width={150}
+              height={64}
               className="h-16 w-auto object-contain"
               onError={(e) => {
                 // Fallback 1: Try local logo.png if the Netbuy path fails
@@ -148,8 +182,9 @@ export default function App() {
                 } else {
                   // Fallback 2: Hide image, show text
                   target.style.display = "none";
-                  if (target.nextSibling)
+                  if (target.nextSibling && target.nextSibling instanceof HTMLElement) {
                     target.nextSibling.style.display = "block";
+                  }
                 }
               }}
             />
@@ -269,7 +304,7 @@ export default function App() {
       <header className="relative h-[90vh] flex items-center justify-center overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
-          <img
+          <Image
             src="https://www.rstisrael.com/wp-content/uploads/home.jpg"
             onError={(e) => {
               // Fallback to stock if original fails
@@ -277,7 +312,9 @@ export default function App() {
                 "https://images.unsplash.com/photo-1576013551627-0cc20b468808?q=80&w=2074&auto=format&fit=crop";
             }}
             alt="Luxury Swimming Pool"
-            className="w-full h-full object-cover animate-fade-in"
+            fill
+            className="object-cover animate-fade-in"
+            priority
           />
           <div className="absolute inset-0 bg-gradient-to-b from-slate-900/80 via-slate-900/40 to-slate-900/90"></div>
         </div>
@@ -295,7 +332,7 @@ export default function App() {
           </h1>
           <p className="text-lg md:text-xl text-slate-200 mb-10 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
             הפתרון המלא לבריכה שלכם: מתכנון הנדסי מוקפד, דרך מערכות יוניזציה
-            ירוקות, ועד לשירות טכני ע"י מומחים מוסמכים.
+            ירוקות, ועד לשירות טכני ע&quot;י מומחים מוסמכים.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button onClick={() => scrollToSection("tech")}>
@@ -445,16 +482,17 @@ export default function App() {
             </div>
 
             <div className="lg:w-1/2 relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-700/50 group bg-white/5 p-4">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-700/50 group bg-white/5 p-4 h-[400px]">
                 {/* Specific Device Image from Uploads */}
-                <img
+                <Image
                   src="https://www.rstisrael.com/wp-content/uploads/NEC-20.png"
                   onError={(e) => {
                     e.currentTarget.src =
                       "https://images.unsplash.com/photo-1563299796-b729d0af54a5?q=80&w=1925&auto=format&fit=crop";
                   }}
                   alt="NEC-20 Ionization System"
-                  className="w-full object-contain transform group-hover:scale-105 transition-transform duration-700"
+                  fill
+                  className="object-contain transform group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent flex items-end p-8 pointer-events-none">
                   <div>
@@ -479,15 +517,18 @@ export default function App() {
             <div className="md:w-1/2 relative">
               <div className="absolute -top-4 -right-4 w-24 h-24 bg-cyan-100 rounded-full -z-10"></div>
               {/* Authentic Project Image */}
-              <img
-                src="https://www.rstisrael.com/wp-content/uploads/IMG_2198.jpg"
-                onError={(e) => {
-                  e.currentTarget.src =
-                    "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1932&auto=format&fit=crop";
-                }}
-                alt="RST Project Construction"
-                className="rounded-2xl shadow-lg w-full object-cover h-[400px]"
-              />
+              <div className="relative h-[400px] w-full">
+                <Image
+                  src="https://www.rstisrael.com/wp-content/uploads/IMG_2198.jpg"
+                  onError={(e) => {
+                    e.currentTarget.src =
+                      "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=80&w=1932&auto=format&fit=crop";
+                  }}
+                  alt="RST Project Construction"
+                  fill
+                  className="rounded-2xl shadow-lg object-cover"
+                />
+              </div>
               <div className="absolute bottom-6 right-6 bg-white p-4 rounded-xl shadow-lg border-r-4 border-cyan-500">
                 <p className="text-3xl font-bold text-slate-900">20+</p>
                 <p className="text-sm text-slate-600">שנות ניסיון</p>
@@ -503,12 +544,12 @@ export default function App() {
               <p className="text-slate-600 text-lg mb-6 leading-relaxed">
                 החברה נוסדה על ידי <strong>רומן טשימוב</strong>, מומחה בעל וותק
                 של למעלה מ-20 שנה. אר.אס.טי מתמחה בתכנון וביצוע עבודות בנייה,
-                אספקת כימיקלים ושרות בריכות בע"מ.
+                אספקת כימיקלים ושרות בריכות בע&quot;מ.
               </p>
               <p className="text-slate-600 mb-8 leading-relaxed">
                 אנו מתמחים במתן פתרונות כוללים למגזר הפרטי והציבורי: החל משלב
                 התכנון ההנדסי, דרך הקמת המערכות ועד לאספקת כימיקלים ושירות שוטף.
-                בין לקוחותינו: רשתות בתי מלון, קיבוצים, מתנ"סים ומרכזי ספורט.
+                בין לקוחותינו: רשתות בתי מלון, קיבוצים, מתנ&quot;סים ומרכזי ספורט.
               </p>
               <div className="flex gap-4">
                 <div className="flex items-center gap-2 text-slate-700 font-medium bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-100">
@@ -650,9 +691,11 @@ export default function App() {
           <div className="col-span-1 md:col-span-2">
             <div className="text-white mb-4">
               {/* Footer Logo */}
-              <img
+              <Image
                 src="https://www.rstisrael.com/wp-content/themes/Netbuy/images/logo.png"
                 alt="RST Logo"
+                width={120}
+                height={40}
                 className="h-10 mb-2 object-contain bg-white/10 rounded p-1"
                 onError={(e) => {
                   const target = e.currentTarget;
@@ -727,7 +770,7 @@ export default function App() {
             שמורות.
           </p>
           <div className="flex gap-4 items-center">
-            <span className="text-slate-500">נבנה ע"י</span>
+            <span className="text-slate-500">נבנה ע&quot;י</span>
             <span className="font-bold text-cyan-500">B.A. אתרים</span>
           </div>
         </div>
